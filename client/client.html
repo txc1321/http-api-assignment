@@ -6,7 +6,83 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
+      const handleResponse = (xhr) => {
+        const content = document.querySelector("#content");
+        //TODO: get css working
 
+        const type =  xhr.getResponseHeader('content-type');
+        let obj;
+
+        if(type === 'text/xml'){
+          console.log(xhr.response);
+        }
+        else{
+          console.log(JSON.parse(xhr.response));
+        }
+
+        switch(xhr.status){
+          case 200:
+            content.innerHTML = `<b>Success</b>`;
+            break;
+          case 400:
+            content.innerHTML = `<b>Bad Request</b>`;
+            break;
+          case 401:
+            content.innerHTML = `<b>Unauthorized</b>`;
+            break;
+          case 403:
+            content.innerHTML = `<b>Forbidden</b>`;
+            break;
+          case 500:
+            content.innerHTML = `<b>Internal</b>`;
+            break;
+          case 501:
+            content.innerHTML = `<b>Not Implemented</b>`;
+            break;
+          case 404:
+            content.innerHTML = `<b>Not Found</b>`;
+            break;
+          default:
+            content.innerHTML = `Error code not implemented by client`;
+            break;
+        }
+
+        if(type === 'text/xml'){
+          content.innerHTML += `<p>Message: ${xhr.responseXML.querySelector('message').textContent}</p>`
+        }
+        else {
+          const obj = JSON.parse(xhr.response);
+          if (obj.message) {
+            content.innerHTML += `<p>Message: ${obj.message}</p>`
+          }
+        }
+      };
+
+      const sendAjax = (url, type) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.setRequestHeader("Accept", type);
+        if(type === 'text/xml'){
+          xhr.responseType = "document";
+        }
+        xhr.onload = () => handleResponse(xhr);
+        xhr.send();
+      };
+
+      const init = () => {
+        const sendButton = document.querySelector("#send");
+
+        const handleClick = () => {
+          const page = document.querySelector("#page");
+          const type = document.querySelector("#type");
+
+          sendAjax(page.value, type.value);
+        };
+
+        sendButton.addEventListener('click', handleClick);
+      };
+
+      window.onload = init;
   </script>
 </head>
 <body>
