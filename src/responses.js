@@ -48,6 +48,13 @@ const badRequest = (request, response, acceptedTypes, params) => {
     return respond(request, response, 400, jsonString, 'application/json');
   }
 
+  if (acceptedTypes[0] === 'text/xml') {
+    let responseXML = '<response>';
+    responseXML = `${responseXML} <message>${responseJSON.message}</message>`;
+    responseXML = `${responseXML} </response>`;
+    return respond(request, response, 200, responseXML, 'text/xml');
+  }
+
   const jsonString = JSON.stringify(responseJSON);
   return respond(request, response, 200, jsonString, 'application/json');
 };
@@ -71,6 +78,13 @@ const unauthorized = (request, response, acceptedTypes, params) => {
 
     const jsonString = JSON.stringify(responseJSON);
     return respond(request, response, 401, jsonString, 'application/json');
+  }
+
+  if (acceptedTypes[0] === 'text/xml') {
+    let responseXML = '<response>';
+    responseXML = `${responseXML} <message>${responseJSON.message}</message>`;
+    responseXML = `${responseXML} </response>`;
+    return respond(request, response, 200, responseXML, 'text/xml');
   }
 
   const jsonString = JSON.stringify(responseJSON);
